@@ -2,19 +2,31 @@ from datetime import datetime
 
 class Identitas:
     def __init__(self, id, name):
-        self.id = id
-        self.name = name
+        self._id = id
+        self._name = name
                 
     def cetakIdentitas(self):
-        return f"{self.id} - {self.name}"
+        return f"{self._id} - {self._name}"
 
 class User(Identitas):
     def __init__(self, user_id, name, email):
         super().__init__(user_id, name)
         self.__email = email
 
+    @property
+    def email(self):
+        return self.__email
+
+    @email.setter
+    def email(self, new_email):
+        if "@" not in new_email:
+            print("Email tidak valid. Harus mengandung '@'")
+        else:
+            self.__email = new_email
+
     def cetakIdentitas(self):
-        return f"{self.id} - {self.name} {self.__email}"
+        return f"{self.id} - {self.name} - {self.__email}"
+
 
 class Project:
     def __init__(self, project_id, name, description):
@@ -45,10 +57,6 @@ class Task:
         self.title = title
         self.status = "To Do"
         self.deadline = deadline
-        self.assigned_user = None
-    
-    def assign_user(self, user):
-        self.assigned_user = user
 
     def update_status(self, status):
         self.status = status
@@ -133,6 +141,7 @@ while True:
                 task_menu = input("Pilih menu task: ")
                 if task_menu == "0":
                     break
+
                 elif task_menu == "1":
                     print("\n--- Tambah Task ---")
                     tid = int(input("ID Task: "))
@@ -140,11 +149,11 @@ while True:
                     deadline = input("Deadline (YYYY-MM-DD): ")
                     task = Task(tid, title, deadline)
                     project.add_task(task)
-                    # tambah reminder automatis
                     deadline_date = datetime.strptime(deadline, "%Y-%m-%d")
                     remind_time = deadline_date.replace(hour=9, minute=0, second=0)
                     task_reminder.add_reminder(task, remind_time)
                     print("Task berhasil ditambahkan.") 
+
                 elif task_menu == "2":
                     print("\n--- Hapus Task ---")
                     tid = int(input("ID Task yang akan dihapus: "))
@@ -157,6 +166,7 @@ while True:
                         print(f"\n--- Daftar Task untuk Project '{project.name}' ---")
                         for t in project.tasks:
                             print(f"{t.task_id} - {t.title} | Status: {t.status} | Deadline: {t.deadline}")
+
                 elif task_menu == "4":
                     print("\n--- Tandai Task Selesai ---")
                     tid = int(input("ID Task yang selesai: "))
@@ -179,8 +189,8 @@ while True:
             user = User(uid, name, email)
             users.append(user)
             print("User berhasil dibuat.")
-            print()
-
+            print()     
+               
         elif pilihan == "4":
             if not projects:
                 print("Belum ada project.")
@@ -205,8 +215,7 @@ while True:
                                 print("      (Belum ada anggota)")
                     else:
                         print("Belum ada tim yang menangani project ini.")
-                    print()
-                
+                    print()             
 
         elif pilihan == "5":
             if not users:
@@ -215,6 +224,7 @@ while True:
                 print("\n--- Semua User ---")
             for u in users:
                 print(u.cetakIdentitas())
+
 
         elif pilihan == "6":
             if not projects:
@@ -231,6 +241,7 @@ while True:
                 print("-" * (max_length + 1))
                 print(string)
                 print("-" * (max_length + 1))
+
 
         elif pilihan == "7":
             while True:
@@ -277,6 +288,7 @@ while True:
                             print(f"User {user.name} berhasil ditambahkan ke Tim {team.name}.")
                         else:
                             print("User tidak ditemukan.")
+
 
                 elif sub_pilihan == "3":
                     print("\n--- Tampilkan Tim ---")
