@@ -1,5 +1,21 @@
 from datetime import datetime
 
+class iterator:
+    def __init__(self, collection):
+        self._collection = collection
+        self._index = 0
+
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        if self._index < len(self._collection):
+            result = self._collection[self._index]
+            self._index += 1
+            return result
+        else:
+            raise StopIteration
+
 class Identitas:
     def __init__(self, id, name):
         self._id = id
@@ -56,8 +72,8 @@ class Project:
     def calculate_progress(self, tasks):
         if not tasks:
             return 0
-        done = sum(1 for t in tasks if t.status == "Siap")
-        return (done / len(tasks)) * 100
+        completed = list(map(lambda t: 1 if t.status == "Siap" else 0, tasks))
+        return (sum(completed) / len(tasks)) * 100
 
 class Task:
     def __init__(self,task_id, title, deadline):
@@ -367,7 +383,7 @@ try:
                     print("Belum ada user.")
                 else:
                     print("\n--- Semua User ---")
-                    itu = iter(users)
+                    itu = iterator(users)
                     while True:
                         try:
                             u = next(itu)
