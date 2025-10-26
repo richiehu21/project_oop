@@ -72,14 +72,31 @@ class Project:
     def calculate_progress(self, tasks):
         if not tasks:
             return 0
-        # Generator expression untuk menghitung task yang selesai
         completed_tasks = (1 for task in tasks if task.status == "Siap")
         return (sum(completed_tasks) / len(tasks)) * 100
 
-# Generator function untuk menghasilkan task titles dari sebuah project
 def get_task_titles(project):
     for task in project.tasks:
         yield task.title
+
+def task_status_processor():
+    tasks = []
+    status_filter = None
+    try:
+        while True:
+            input_val = yield len(tasks)
+            
+            if isinstance(input_val, list):
+                tasks = input_val
+            elif isinstance(input_val, str):
+                status_filter = input_val
+                if status_filter == 'all':
+                    yield tasks
+                else:
+                    yield [t for t in tasks if t.status == status_filter]
+    except GeneratorExit:
+        tasks = []
+        status_filter = None
 
 class Task:
     def __init__(self,task_id, title, deadline):
@@ -356,12 +373,23 @@ try:
                             print(f"{project.project_id} - {project.name}: {project.description}")
                             print("-" * (max_length + 1))
                             
-                            # Menggunakan generator function untuk menampilkan task titles
                             print("Daftar Task:")
                             for title in get_task_titles(project):
                                 print(f"- {title}")
                             
-                            # Menggunakan generator expression melalui calculate_progress
+                            
+                            print("\nStatus Tasks:")
+                            processor = task_status_processor()
+                            next(processor)
+                            processor.send(project.get_tasks())
+                            next(processor)
+                            todo_tasks = processor.send("To Do")
+                            done_tasks = processor.send("Siap")
+                            print(f"- To Do: {len(todo_tasks)} task")
+                            print(f"- Selesai: {len(done_tasks)} task")
+                            processor.close()
+                            
+                            
                             progress = project.calculate_progress(project.get_tasks())
                             print(f"Progress Project '{project.name}': {progress:.2f}%")
                             if project.teams:
