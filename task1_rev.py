@@ -79,24 +79,13 @@ def get_task_titles(project):
     for task in project.tasks:
         yield task.title
 
-def task_status_processor():
-    tasks = []
-    status_filter = None
-    try:
-        while True:
-            input_val = yield len(tasks)
-            
-            if isinstance(input_val, list):
-                tasks = input_val
-            elif isinstance(input_val, str):
-                status_filter = input_val
-                if status_filter == 'all':
-                    yield tasks
-                else:
-                    yield [t for t in tasks if t.status == status_filter]
-    except GeneratorExit:
-        tasks = []
-        status_filter = None
+def task_status_monitor():
+    while True:
+        task = yield
+        if task.status == "Siap":
+            print(f"Task '{task.title}' telah selesai!")
+        elif task.status == "To Do":
+            print(f"Task '{task.title}' masih dalam pengerjaan")
 
 class Task:
     def __init__(self,task_id, title, deadline):
@@ -379,17 +368,12 @@ try:
                             
                             
                             print("\nStatus Tasks:")
-                            processor = task_status_processor()
-                            next(processor)
-                            processor.send(project.get_tasks())
-                            next(processor)
-                            todo_tasks = processor.send("To Do")
-                            done_tasks = processor.send("Siap")
-                            print(f"- To Do: {len(todo_tasks)} task")
-                            print(f"- Selesai: {len(done_tasks)} task")
-                            processor.close()
-                            
-                            
+                            monitor = task_status_monitor()
+                            next(monitor)
+                            for task in project.tasks:
+                                monitor.send(task)
+                            monitor.close()
+                
                             progress = project.calculate_progress(project.get_tasks())
                             print(f"Progress Project '{project.name}': {progress:.2f}%")
                             if project.teams:
