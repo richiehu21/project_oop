@@ -72,8 +72,14 @@ class Project:
     def calculate_progress(self, tasks):
         if not tasks:
             return 0
-        completed = list(map(lambda t: 1 if t.status == "Siap" else 0, tasks))
-        return (sum(completed) / len(tasks)) * 100
+        # Generator expression untuk menghitung task yang selesai
+        completed_tasks = (1 for task in tasks if task.status == "Siap")
+        return (sum(completed_tasks) / len(tasks)) * 100
+
+# Generator function untuk menghasilkan task titles dari sebuah project
+def get_task_titles(project):
+    for task in project.tasks:
+        yield task.title
 
 class Task:
     def __init__(self,task_id, title, deadline):
@@ -349,6 +355,13 @@ try:
                             print("-" * (max_length + 1))
                             print(f"{project.project_id} - {project.name}: {project.description}")
                             print("-" * (max_length + 1))
+                            
+                            # Menggunakan generator function untuk menampilkan task titles
+                            print("Daftar Task:")
+                            for title in get_task_titles(project):
+                                print(f"- {title}")
+                            
+                            # Menggunakan generator expression melalui calculate_progress
                             progress = project.calculate_progress(project.get_tasks())
                             print(f"Progress Project '{project.name}': {progress:.2f}%")
                             if project.teams:
