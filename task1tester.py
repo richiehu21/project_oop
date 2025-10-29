@@ -17,11 +17,10 @@ class iterator:
         else:
             raise StopIteration
 
-# DIUBAH: Menjadi Abstract Base Class (ABC)
 class Identitas(ABC):
     def __init__(self, id, name):
-        self._id = id      # Atribut protected
-        self._name = name  # Atribut protected
+        self._id = id      
+        self._name = name  
                 
     @property
     def id(self):
@@ -31,36 +30,30 @@ class Identitas(ABC):
     def name(self):
         return self._name
 
-    @abstractmethod  # Menandakan ini adalah abstract method
+    @abstractmethod  
     def cetakIdentitas(self):
-        """Metode ini harus di-override oleh subclass."""
         pass
 
 class User(Identitas):
     def __init__(self, user_id, name, email):
         super().__init__(user_id, name)
-        # DIUBAH: Menggunakan setter untuk validasi saat inisialisasi
-        self.__email = None # Inisialisasi atribut private
-        self.email = email  # Panggil setter untuk validasi
+        self.__email = None 
+        self.email = email  
 
     @property
     def email(self):
-        return self.__email # Atribut private
+        return self.__email
 
     @email.setter
     def email(self, new_email):
-        # DIUBAH: Logika setter diperbaiki agar lebih aman
         if new_email and "@" in new_email:
             self.__email = new_email
         elif new_email is None:
             self.__email = None
         else:
-            # Tetap memberi tahu jika email tidak valid, tapi tidak menghentikan program
             print(f"Email '{new_email}' tidak valid. Harus mengandung '@'. Email tidak diubah.")
 
-    # DIUBAH: Override dari abstract method di class Identitas
     def cetakIdentitas(self):
-        # Akan menampilkan 'None' jika email tidak valid saat di-set
         return f"{self.id} - {self.name} - {self.__email}"
 
 
@@ -75,7 +68,7 @@ class Project(Identitas):
         self.teams.append(team)
 
     def add_task(self, task):
-        self.tasks.append(task)
+        self.tasks.append(task) 
 
     def get_tasks(self):
         return self.tasks
@@ -83,19 +76,18 @@ class Project(Identitas):
     def calculate_progress(self, tasks):
         if not tasks:
             return 0
-        # Implementasi Generator Expression
         completed_tasks = (1 for task in tasks if task.status == "Siap")
         return (sum(completed_tasks) / len(tasks)) * 100
 
     def cetakIdentitas(self):
         return f"{self.id} - {self.name}: {self.description}"
 
-# Implementasi Generator Function
+
 def get_task_titles(project):
     for task in project.tasks:
         yield task.name
 
-# Implementasi Coroutine
+
 def task_status_monitor():
     while True:
         task = yield
@@ -121,8 +113,8 @@ class Team(Identitas):
         super().__init__(team_id, name)
         self.members = []
 
-    # DIUBAH: Menggunakan *args untuk "Method Overloading"
-    # Bisa menerima satu atau banyak user sekaligus
+    
+    
     def add_member(self, *users):
         for user in users:
             if isinstance(user, User):
@@ -139,7 +131,7 @@ class Team(Identitas):
         
 class TaskReminder:
     def __init__(self):
-        self.reminders = []
+        self.reminders = []     
 
     def add_reminder(self, task, remind_time):
         self.reminders.append({"task": task, "remind_time": remind_time})
@@ -148,12 +140,12 @@ class TaskReminder:
         current_time = datetime.now()
         due = []
         for r in list(self.reminders):
-            # Implementasi Try-Exception
+            
             try:
                 if current_time >= r["remind_time"] and r["task"].status != "Siap":
                     due.append(r["task"])
             except Exception:
-                # Menangani jika ada data reminder yang korup (cth: task terhapus)
+                
                 continue
         return due
 
@@ -162,72 +154,62 @@ users = []
 teams = []
 task_reminder = TaskReminder()
 
-#😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎
 
-# ... (Salin semua definisi kelas Anda di sini: iterator, Identitas, User, Project, Task, Team, TaskReminder) ...
-# (Pastikan semua kelas dari kode Anda sebelumnya ada di atas ini)
 
-# --- DATA DUMMY (supaya tidak capek mengetik)---
 
-# 1. Buat 3 User
+
+
+#=================DUMMY===================
+
+
 user1 = User(101, "Budi Santoso", "budi@example.com")
 user2 = User(102, "Citra Lestari", "citra@example.com")
-# User ini akan memiliki email 'None' setelah validasi setter
+
 user3 = User(103, "Doni Firmansyah", "doni.invalid") 
 
 users = [user1, user2, user3]
 
-# 2. Buat 2 Project
+
 project1 = Project(1, "Sistem E-commerce", "Pengembangan platform e-commerce baru")
 project2 = Project(2, "Aplikasi Mobile Banking", "Pembuatan aplikasi mobile untuk nasabah")
 
-projects = [project1, project2] # Ini menimpa list 'projects' yang ada sebelumnya
+projects = [project1, project2] 
 
-# 3. Buat 3 Task
+
 task1 = Task(1001, "Desain Halaman Utama", datetime(2025, 11, 10))
 task2 = Task(1002, "Implementasi Keranjang Belanja", datetime(2025, 11, 15))
 task3 = Task(2001, "Setup Database API", datetime(2025, 11, 12))
 
-# 4. Buat 2 Tim
+
 team1 = Team(50, "Tim Frontend")
 team2 = Team(51, "Tim Backend")
 
 teams = [team1, team2]
 
-# 5. Hubungkan data (Assign Task, Tim, dan Anggota)
 
-# Assign tasks ke project
 project1.add_task(task1)
 project1.add_task(task2)
 project2.add_task(task3)
 
-# Assign tim ke project
+
 project1.append_team(team1)
 project2.append_team(team2)
 
-# Assign anggota ke tim
-team1.add_member(user1, user2) # Menambahkan Budi dan Citra ke Tim Frontend
-team2.add_member(user3)        # Menambahkan Doni ke Tim Backend
 
-# 6. Inisialisasi TaskReminder dan tambahkan task
+team1.add_member(user1, user2) 
+team2.add_member(user3)        
+
+
 task_reminder = TaskReminder()
-# (Deadline jam 9 pagi)
+
 task_reminder.add_reminder(task1, task1.deadline.replace(hour=9, minute=0))
 task_reminder.add_reminder(task2, task2.deadline.replace(hour=9, minute=0))
 task_reminder.add_reminder(task3, task3.deadline.replace(hour=9, minute=0))
 
-# --- AKHIR DATA DUMMY ---
-
-
-# ... (Salin sisa kode Anda di sini, yaitu blok 'try...except' dengan 'while True' untuk menu) ...
-# (Pastikan kode menu utama Anda ada di bawah ini)
-
-#😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎
+#=================DUMMY END===================
 
 
 
-
-# Implementasi Try-Exception (Blok utama)
 try:
     while True:
         print(
@@ -257,7 +239,6 @@ try:
                     name = input("Nama Project: ").strip()
                     desc = input("Deskripsi: ").strip()
                     exists = False
-                    # Implementasi iter() function
                     itp = iter(projects)
                     while True:
                         try:
@@ -311,7 +292,7 @@ try:
                             try:
                                 print("\n--- Tambah Task ---")
                                 tid = int(input("ID Task: ").strip())
-                                # Implementasi iter() function
+                                
                                 it = iter(project.tasks)
 
                                 result = False
@@ -363,7 +344,6 @@ try:
 
                                 if task:
                                     project.tasks.remove(task)
-                                    # Implementasi List Comprehension
                                     task_reminder.reminders = [r for r in task_reminder.reminders if r.get("task") != task]
                                     print("Task berhasil dihapus.")
                                 else:
@@ -438,10 +418,10 @@ try:
                     if exists:
                         print("ID User sudah ada.")
                         continue
-                    user = User(uid, name, email) # Pembuatan objek User
+                    user = User(uid, name, email) 
                     users.append(user)
                     print("User berhasil dibuat.")
-                    # Jika email tidak valid saat input, __email akan None
+                    
                     if user.email is None:
                         print(f"Peringatan: Email '{email}' tidak valid dan tidak disimpan.")
                     print()
@@ -465,17 +445,17 @@ try:
                             print("-" * (max_length + 1))
                             
                             print("Daftar Task:")
-                            # Menggunakan Generator Function
+                            
                             for title in get_task_titles(project):
                                 print(f"- {title}")
                             
                             
                             print("\nStatus Tasks:")
-                            # Menggunakan Coroutine
+                            
                             monitor = task_status_monitor()
-                            next(monitor) # Inisialisasi coroutine
+                            next(monitor) 
                             for task in project.tasks:
-                                monitor.send(task) # Mengirim data ke coroutine
+                                monitor.send(task) 
                             monitor.close()
                 
                             progress = project.calculate_progress(project.get_tasks())
@@ -494,7 +474,7 @@ try:
                                             try:
                                                 member = next(members_it)
                                                 has_member = True
-                                                print(f"      {member.cetakIdentitas()}") # Pemanggilan method override
+                                                print(f"      {member.cetakIdentitas()}") 
                                             except StopIteration:
                                                 break
                                         if not has_member:
@@ -512,12 +492,11 @@ try:
                     print("Belum ada user.")
                 else:
                     print("\n--- Semua User ---")
-                    # Implementasi Class Iterator
                     itu = iterator(users)
                     while True:
                         try:
                             u = next(itu)
-                            print(u.cetakIdentitas()) # Pemanggilan method override
+                            print(u.cetakIdentitas())    
                         except StopIteration:
                             break
 
@@ -547,6 +526,8 @@ try:
                         print("-" * (max_length + 1))
                     except StopIteration:
                         break
+                    finally:
+                        print("Semua project sudah ditampilkan.")
 
 
             elif pilihan == "7":
@@ -603,8 +584,8 @@ try:
                             print("Terjadi kesalahan saat membuat tim:", e)
 
                     elif sub_pilihan == "2":
-                        # DIUBAH: Logika untuk menangani input banyak user
-                        # untuk method "overloaded" add_member
+                        
+                        
                         try:
                             print("\n--- Tambah Anggota ke Tim ---")
                             if not teams:
@@ -659,7 +640,7 @@ try:
                                 print(f"User dengan ID berikut tidak ditemukan: {', '.join(users_not_found)}")
                             
                             if users_to_add:
-                                # Memanggil method "overloaded" dengan * (unpacking list)
+                                
                                 team.add_member(*users_to_add) 
                             else:
                                 print("Tidak ada user valid yang ditambahkan.")
@@ -679,7 +660,7 @@ try:
                         while True:
                             try:
                                 tm = next(itt)
-                                print(tm.cetakIdentitas()) #ini_coi
+                                print(tm.cetakIdentitas()) 
                                 print("Anggota:")
                                 members_it = iter(tm.get_members())
                                 has_member = False
