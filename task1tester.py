@@ -492,13 +492,9 @@ try:
                     print("Belum ada user.")
                 else:
                     print("\n--- Semua User ---")
-                    itu = iterator(users)
-                    while True:
-                        try:
-                            u = next(itu)
-                            print(u.cetakIdentitas())    
-                        except StopIteration:
-                            break
+                    identitas_iterator = map(lambda user: user.cetakIdentitas(), users)
+                    for identitas_str in identitas_iterator:
+                        print(identitas_str)
 
 
             elif pilihan == "6":
@@ -516,8 +512,10 @@ try:
                             max_length = len(string)
                     except StopIteration:
                         break
+
                 itp = iter(projects)
-                while True:
+                finished = False
+                while not finished:
                     try:
                         p = next(itp)
                         string = p.cetakIdentitas()
@@ -525,10 +523,11 @@ try:
                         print(string)
                         print("-" * (max_length + 1))
                     except StopIteration:
-                        break
+                        finished = True
                     finally:
-                        print("Semua project sudah ditampilkan.")
-
+                        if finished:
+                            print("Semua project sudah ditampilkan.")
+                
 
             elif pilihan == "7":
                 while True:
