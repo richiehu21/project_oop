@@ -610,39 +610,34 @@ try:
                                 print("Tidak ada ID User yang dimasukkan.")
                                 continue
                             
-                            uids_list = uids_str.split(',')
-                            users_to_add = []
-                            users_not_found = []
-
-                            for uid_str in uids_list:
-                                try:
-                                    uid = int(uid_str.strip())
-                                    user = None
-                                    itu = iter(users)
-                                    while True:
-                                        try:
-                                            uu = next(itu)
-                                            if uu.id == uid:
-                                                user = uu
-                                                break
-                                        except StopIteration:
-                                            break
-                                    
-                                    if user:
-                                        users_to_add.append(user)
-                                    else:
-                                        users_not_found.append(uid_str.strip())
-                                except ValueError:
-                                    print(f"ID '{uid_str.strip()}' bukan angka yang valid.")
+                            user_map = {user.id: user for user in users}
                             
-                            if users_not_found:
-                                print(f"User dengan ID berikut tidak ditemukan: {', '.join(users_not_found)}")
+                            target_id_strs = [s.strip() for s in uids_str.split(',') if s.strip()]
+                            target_ids = set()
+                            invalid_inputs = []
+
+                            for s in target_id_strs:
+                                try:
+                                    target_ids.add(int(s))
+                                except ValueError:
+                                    invalid_inputs.append(s)
+
+                            users_to_add = [user_map[uid] for uid in target_ids if uid in user_map]
+                            
+                            found_ids = {user.id for user in users_to_add}
+                            
+                            not_found_ids = target_ids - found_ids 
+                            
+                            if invalid_inputs:
+                                print(f"Input berikut bukan ID angka yang valid: {', '.join(invalid_inputs)}")
+                            if not_found_ids:
+                                print(f"User dengan ID berikut tidak ditemukan: {', '.join(map(str, not_found_ids))}")
                             
                             if users_to_add:
-                                
                                 team.add_member(*users_to_add) 
                             else:
                                 print("Tidak ada user valid yang ditambahkan.")
+                            
                                 
                         except ValueError:
                             print("ID Tim harus berupa angka.")
